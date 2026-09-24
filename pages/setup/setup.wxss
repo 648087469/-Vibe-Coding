@@ -1,0 +1,151 @@
+.banner {
+  margin: 24rpx 24rpx 0;
+  padding: 22rpx 24rpx;
+  border-radius: 16rpx;
+  background: #fff8e6;
+  border: 2rpx solid #f2dfae;
+  color: #8a6d1f;
+  font-size: 25rpx;
+  line-height: 1.6;
+}
+
+.exams {
+  display: flex;
+  gap: 20rpx;
+}
+
+.exam {
+  flex: 1;
+  border: 2rpx solid #e3e8ef;
+  border-radius: 14rpx;
+  padding: 22rpx;
+  background: #fafbfd;
+}
+
+.exam.on {
+  border-color: #2b6cb0;
+  background: #eef4fb;
+}
+
+.exam-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.exam.on .exam-name {
+  color: #2b6cb0;
+}
+
+.exam-full {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #8b95a5;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.value {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #2b6cb0;
+}
+
+.pick {
+  padding: 22rpx 24rpx;
+  border-radius: 14rpx;
+  background: #f7f9fc;
+  border: 2rpx solid #e3e8ef;
+}
+
+.date {
+  padding: 14rpx 24rpx;
+  border-radius: 12rpx;
+  background: #f2f4f8;
+  font-size: 30rpx;
+}
+
+.arrow {
+  color: #8b95a5;
+}
+
+.mods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.modes {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.mode {
+  flex: 1;
+  padding: 22rpx;
+  border-radius: 14rpx;
+  border: 2rpx solid #e3e8ef;
+  background: #fafbfd;
+}
+
+.mode.on {
+  border-color: #2b6cb0;
+  background: #eef4fb;
+}
+
+.mode-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.mode.on .mode-name {
+  color: #2b6cb0;
+}
+
+.mode-desc {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #8b95a5;
+  line-height: 1.5;
+}
+
+.mod {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 14rpx 22rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid #e3e8ef;
+  font-size: 26rpx;
+  color: #6b7280;
+}
+
+.mod.on {
+  border-color: #2b6cb0;
+  color: #2b6cb0;
+  background: #eef4fb;
+}
+
+.mod-part {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 6rpx;
+  background: #dfe7f1;
+  color: #4b5b6e;
+}
+
+.summary {
+  margin: 0 24rpx 24rpx;
+  padding: 22rpx;
+  border-radius: 16rpx;
+  background: #eef4fb;
+  color: #2b6cb0;
+  font-size: 26rpx;
+  text-align: center;
+}

@@ -1,0 +1,56 @@
+page {
+  background: #f2f4f8;
+  color: #1f2937;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(31, 41, 55, 0.06);
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.btn {
+  border-radius: 999rpx;
+  text-align: center;
+  padding: 24rpx;
+  margin: 0 24rpx 20rpx;
+  font-size: 30rpx;
+}
+
+.btn.small {
+  margin: 0;
+  padding: 18rpx 32rpx;
+  font-size: 28rpx;
+}
+
+.btn.primary {
+  background: #2b6cb0;
+  color: #fff;
+}
+
+.btn.ghost {
+  background: #fff;
+  color: #2b6cb0;
+  border: 2rpx solid #cbd8e6;
+}
+
+.btn.danger {
+  background: #fff;
+  color: #c0392b;
+  border: 2rpx solid #f0d2cd;
+}
+
+.hint {
+  color: #8b95a5;
+  font-size: 24rpx;
+}

@@ -1,0 +1,129 @@
+<view class="head">
+  <view class="grow">
+    <view class="head-title">{{examName}} · 备考安排</view>
+    <view class="head-sub">
+      共 {{stat.days}} 天 · {{stat.total}} 个任务 · 已完成 {{stat.done}}（{{stat.rate}}%）· {{modeName}}
+    </view>
+  </view>
+  <view class="head-btn" bindtap="onReset">重置</view>
+</view>
+
+<view class="tabs">
+  <view class="tab {{mode === 'week' ? 'on' : ''}}" data-mode="week" bindtap="onMode">课程表</view>
+  <view class="tab {{mode === 'month' ? 'on' : ''}}" data-mode="month" bindtap="onMode">日历</view>
+</view>
+
+<block wx:if="{{mode === 'week'}}">
+  <view class="card">
+    <view class="bar">
+      <view class="nav" data-delta="-1" bindtap="onWeekStep">‹</view>
+      <view class="bar-title">{{weekTitle}}</view>
+      <view class="nav" data-delta="1" bindtap="onWeekStep">›</view>
+    </view>
+
+    <view class="wk-row wk-head">
+      <view class="wk-day"></view>
+      <view class="wk-th" wx:for="{{slots}}" wx:key="name">
+        <view class="slot-name">{{item.name}}</view>
+        <view class="slot-time">{{item.time}}</view>
+      </view>
+    </view>
+
+    <view class="wk-row {{item.today ? 'is-today' : ''}} {{item.off ? 'off' : ''}}" wx:for="{{rows}}" wx:key="key">
+      <view class="wk-day">
+        <view class="day-label">{{item.label}}</view>
+        <view class="day-date">{{item.date}}</view>
+      </view>
+      <view
+        class="wk-td {{cell.cls}}"
+        wx:for="{{item.cells}}"
+        wx:for-item="cell"
+        wx:for-index="ci"
+        wx:key="k"
+        data-key="{{item.key}}"
+        bindtap="onCellTap"
+      >
+        <block wx:if="{{cell.name}}">
+          <view class="course">{{cell.name}}</view>
+          <view class="course-min">{{cell.minutes}} 分钟</view>
+        </block>
+        <view class="course-empty" wx:else>空</view>
+      </view>
+    </view>
+
+    <view class="bar-foot">
+      <view class="mini" bindtap="onThisWeek">回到本周</view>
+    </view>
+  </view>
+  <view class="tip">点击格子里的课程即可编辑当天安排 · 蓝 = 待完成，绿 = 已完成</view>
+</block>
+
+<block wx:else>
+  <view class="card">
+    <view class="bar">
+      <view class="nav" bindtap="onPrev">‹</view>
+      <view class="bar-title">{{title}}</view>
+      <view class="nav" bindtap="onNext">›</view>
+    </view>
+
+    <view class="week">
+      <view class="week-cell" wx:for="{{week}}" wx:key="*this">{{item}}</view>
+    </view>
+
+    <view class="grid">
+      <block wx:for="{{cells}}" wx:key="key">
+        <view class="cell empty" wx:if="{{item.empty}}"></view>
+        <view
+          wx:else
+          class="cell {{item.inPlan ? 'inplan' : ''}} {{item.isToday ? 'today' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="onCellTap"
+        >
+          <view class="day">{{item.day}}</view>
+          <view class="dots">
+            <view
+              wx:if="{{item.count}}"
+              class="dot {{item.allDone ? 'done' : item.partial ? 'half' : ''}}"
+            ></view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+  <view class="tip">点击日期可调整当天任务 · 蓝 = 未开始，黄 = 部分完成，绿 = 已完成</view>
+</block>
+
+<view class="btn ghost" bindtap="onBack">返回修改设置</view>
+
+<view class="mask" wx:if="{{popup}}" bindtap="closePopup">
+  <view class="sheet" catchtap="noop">
+    <view class="sheet-head">
+      <text class="sheet-title">{{dayLabel}}</text>
+      <text class="hint">{{tasks.length}} 项 · {{dayMinutes}} 分钟</text>
+    </view>
+
+    <scroll-view scroll-y class="tasks">
+      <view class="task" wx:for="{{tasks}}" wx:key="id">
+        <view class="check {{item.done ? 'on' : ''}}" data-id="{{item.id}}" bindtap="toggleDone">
+          {{item.done ? '✓' : ''}}
+        </view>
+        <picker class="grow" range="{{modNames}}" value="{{item.mi}}" data-id="{{item.id}}" bindchange="changeModule">
+          <view class="task-name">{{item.name}}</view>
+          <view class="task-time">{{item.time}} 起</view>
+        </picker>
+        <view class="step">
+          <text class="step-btn" data-id="{{item.id}}" data-delta="{{-15}}" bindtap="changeMinutes">−</text>
+          <text class="step-num">{{item.minutes}}</text>
+          <text class="step-btn" data-id="{{item.id}}" data-delta="{{15}}" bindtap="changeMinutes">+</text>
+        </view>
+        <text class="del" data-id="{{item.id}}" bindtap="removeTask">×</text>
+      </view>
+      <view class="empty-tip" wx:if="{{!tasks.length}}">当天暂无任务，可点击下方按钮新增</view>
+    </scroll-view>
+
+    <view class="sheet-foot">
+      <view class="btn ghost small" bindtap="addTask">+ 新增任务</view>
+      <view class="btn primary small" bindtap="closePopup">完成</view>
+    </view>
+  </view>
+</view>

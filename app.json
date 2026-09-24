@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "pages/setup/setup",
+    "pages/calendar/calendar"
+  ],
+  "window": {
+    "navigationBarTitleText": "公考备考安排",
+    "navigationBarBackgroundColor": "#2b6cb0",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f2f4f8"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

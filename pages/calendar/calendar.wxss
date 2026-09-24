@@ -1,0 +1,384 @@
+.head {
+  display: flex;
+  align-items: center;
+  padding: 30rpx 30rpx 6rpx;
+}
+
+.head-title {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.head-sub {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #8b95a5;
+}
+
+.head-btn {
+  padding: 12rpx 26rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid #f0d2cd;
+  color: #c0392b;
+  font-size: 24rpx;
+  flex: none;
+}
+
+.tabs {
+  display: flex;
+  gap: 16rpx;
+  margin: 20rpx 24rpx 0;
+}
+
+.tab {
+  padding: 12rpx 32rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #6b7280;
+  font-size: 28rpx;
+}
+
+.tab.on {
+  background: #2b6cb0;
+  color: #fff;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.bar-title {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.nav {
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 60rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #f2f4f8;
+  font-size: 36rpx;
+  color: #4b5b6e;
+  flex: none;
+}
+
+/* ---------- 课程表 ---------- */
+.wk-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.wk-head {
+  padding-bottom: 6rpx;
+}
+
+.wk-row.is-today .wk-day {
+  color: #2b6cb0;
+  font-weight: 600;
+}
+
+.wk-row.off .wk-td {
+  opacity: 0.45;
+}
+
+.wk-day {
+  width: 96rpx;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 14rpx 0;
+  color: #6b7280;
+}
+
+.day-label {
+  font-size: 26rpx;
+}
+
+.day-date {
+  font-size: 22rpx;
+  color: #a4adba;
+}
+
+.wk-th {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  padding-bottom: 8rpx;
+}
+
+.slot-name {
+  font-size: 24rpx;
+  color: #4b5b6e;
+}
+
+.slot-time {
+  font-size: 20rpx;
+  color: #a4adba;
+}
+
+.wk-td {
+  flex: 1;
+  min-width: 0;
+  margin: 5rpx;
+  padding: 12rpx 6rpx;
+  border-radius: 12rpx;
+  text-align: center;
+  background: #fafbfd;
+  border: 2rpx dashed #e3e8ef;
+  min-height: 100rpx;
+  box-sizing: border-box;
+}
+
+.wk-td.todo {
+  background: #eef4fb;
+  border: 2rpx solid #cbd8e6;
+}
+
+.wk-td.done {
+  background: #e9f6ee;
+  border: 2rpx solid #b6e0c6;
+}
+
+.course {
+  font-size: 22rpx;
+  color: #1f2937;
+  line-height: 1.3;
+}
+
+.wk-td.done .course {
+  color: #2f9e63;
+}
+
+.course-min {
+  margin-top: 4rpx;
+  font-size: 20rpx;
+  color: #8b95a5;
+}
+
+.course-empty {
+  font-size: 20rpx;
+  color: #c3cad4;
+  line-height: 72rpx;
+}
+
+.bar-foot {
+  display: flex;
+  justify-content: center;
+  margin-top: 16rpx;
+}
+
+.mini {
+  padding: 12rpx 32rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid #cbd8e6;
+  color: #2b6cb0;
+  font-size: 24rpx;
+}
+
+/* ---------- 日历 ---------- */
+.week,
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.week-cell {
+  width: 14.28%;
+  text-align: center;
+  font-size: 24rpx;
+  color: #8b95a5;
+  padding: 10rpx 0;
+}
+
+.cell {
+  width: 14.28%;
+  padding: 8rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.cell .day {
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 28rpx;
+  color: #b3bbc7;
+}
+
+.cell.inplan .day {
+  color: #1f2937;
+  background: #f2f4f8;
+}
+
+.cell.today .day {
+  background: #2b6cb0;
+  color: #fff;
+}
+
+.dots {
+  height: 16rpx;
+  display: flex;
+  align-items: center;
+}
+
+.dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #2b6cb0;
+}
+
+.dot.half {
+  background: #e0a72c;
+}
+
+.dot.done {
+  background: #2f9e63;
+}
+
+.tip {
+  margin: 8rpx 30rpx 24rpx;
+  font-size: 24rpx;
+  color: #8b95a5;
+}
+
+/* ---------- 编辑弹层 ---------- */
+.mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: flex-end;
+  z-index: 10;
+}
+
+.sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 28rpx 24rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.sheet-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.sheet-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.tasks {
+  max-height: 52vh;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f0f2f6;
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.check {
+  width: 44rpx;
+  height: 44rpx;
+  line-height: 44rpx;
+  text-align: center;
+  border-radius: 50%;
+  border: 2rpx solid #cbd8e6;
+  color: #fff;
+  font-size: 26rpx;
+  flex: none;
+}
+
+.check.on {
+  background: #2f9e63;
+  border-color: #2f9e63;
+}
+
+.task-name {
+  font-size: 28rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.task-time {
+  font-size: 22rpx;
+  color: #a4adba;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex: none;
+}
+
+.step-btn {
+  width: 48rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #f2f4f8;
+  color: #4b5b6e;
+  font-size: 30rpx;
+}
+
+.step-num {
+  min-width: 64rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #4b5b6e;
+}
+
+.del {
+  width: 48rpx;
+  text-align: center;
+  color: #c0392b;
+  font-size: 34rpx;
+  flex: none;
+}
+
+.empty-tip {
+  padding: 40rpx 0;
+  text-align: center;
+  color: #8b95a5;
+  font-size: 26rpx;
+}
+
+.sheet-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-top: 24rpx;
+}
+
+.sheet-foot .btn {
+  flex: 1;
+}

@@ -1,0 +1,91 @@
+<view class="banner" wx:if="{{hasPlan}}">
+  已保存计划：{{planSummary}}。下方已回填该计划的设置，直接调整后可重新生成，或点「查看当前计划」继续。
+</view>
+
+<view class="card">
+  <view class="title">1 · 选择考试</view>
+  <view class="exams">
+    <view
+      class="exam {{examIndex === index ? 'on' : ''}}"
+      wx:for="{{exams}}"
+      wx:key="key"
+      data-index="{{index}}"
+      bindtap="onExamChange"
+    >
+      <view class="exam-name">{{item.name}}</view>
+      <view class="exam-full">{{item.full}}</view>
+    </view>
+  </view>
+</view>
+
+<view class="card">
+  <view class="title">2 · 每日学习时间</view>
+  <picker
+    mode="multiSelector"
+    range="{{timeRange}}"
+    value="{{timeIndex}}"
+    bindchange="onTimeChange"
+  >
+    <view class="row pick">
+      <text class="value">{{timeText}} / 天</text>
+      <text class="arrow">⌄</text>
+    </view>
+  </picker>
+  <view class="hint">上下滑动选择小时与分钟，共 {{minutes}} 分钟</view>
+</view>
+
+<view class="card">
+  <view class="title">3 · 备考时间</view>
+  <view class="row">
+    <picker mode="date" value="{{start}}" bindchange="onStartChange">
+      <view class="date">{{start}}</view>
+    </picker>
+    <text class="arrow">→</text>
+    <picker mode="date" value="{{end}}" bindchange="onEndChange">
+      <view class="date">{{end}}</view>
+    </picker>
+  </view>
+  <view class="hint">共 {{days}} 天，结束日期默认为笔试日前一天</view>
+  <view class="hint">{{examHint}}</view>
+</view>
+
+<view class="card">
+  <view class="title">4 · 安排方式</view>
+  <view class="modes">
+    <view
+      class="mode {{mode === item.key ? 'on' : ''}}"
+      wx:for="{{modes}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onModeChange"
+    >
+      <view class="mode-name">{{item.name}}</view>
+      <view class="mode-desc">{{item.desc}}</view>
+    </view>
+  </view>
+  <view class="hint">{{modeHint}}</view>
+  <view class="hint">{{theoryHint}}</view>
+  <view class="hint">{{mockHint}}</view>
+</view>
+
+<view class="card">
+  <view class="title">5 · 需要复习的模块</view>
+  <view class="mods">
+    <view
+      class="mod {{item.checked ? 'on' : ''}}"
+      wx:for="{{mods}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onToggleModule"
+    >
+      <text class="mod-part">{{item.part}}</text>
+      <text class="mod-name">{{item.name}}</text>
+    </view>
+  </view>
+</view>
+
+<view class="summary">预计 {{days}} 天 · 每天 {{timeText}} · 约 {{taskCount}} 个学习任务</view>
+
+<view class="btn primary" bindtap="onGenerate">{{hasPlan ? '重新生成计划（覆盖现有）' : '生成学习计划'}}</view>
+<view class="btn ghost" wx:if="{{hasPlan}}" bindtap="onViewPlan">查看当前计划</view>
+<view class="btn danger" wx:if="{{hasPlan}}" bindtap="onClear">清空计划</view>
