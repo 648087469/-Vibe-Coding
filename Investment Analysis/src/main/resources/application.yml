@@ -1,0 +1,165 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  application:
+    name: investment-analysis
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # createDatabaseIfNotExist=true：数据库不存在时自动创建，无需手工建库
+    url: jdbc:mysql://127.0.0.1:3306/investment_analysis?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:yangjiali@1011}
+    hikari:
+      pool-name: investment-analysis-pool
+      minimum-idle: 2
+      maximum-pool-size: 10
+      connection-timeout: 10000
+      idle-timeout: 600000
+
+  sql:
+    init:
+      # 每次启动执行 schema.sql，脚本内部全部使用 IF NOT EXISTS，可重复执行
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      continue-on-error: false
+
+  jackson:
+    default-property-inclusion: always
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+
+logging:
+  level:
+    root: info
+    com.investment.analysis: info
+
+# ============ 投资分析模块业务参数 ============
+analysis:
+  # 取样窗口：365 天
+  window-days: 365
+  # 对比“七天前”的涨跌幅（百分比，负数表示下跌）
+  change-window-days: 7
+  # 对比基准取法：DATE=按自然日回溯 7 天后的最近交易日；BAR=直接取倒数第 7 根 K 线
+  change-window-mode: DATE
+  # 365 天最低点对应的胜率
+  min-win-rate: 90
+  # 365 天最高点对应的胜率
+  max-win-rate: 10
+  # 胜率 = 基础胜率 + 涨跌幅(%) * 10
+  change-multiplier: 10
+  # 涨跌幅对胜率的作用方向：
+  #   INVERSE = 反向：指数上涨 -> 下调胜率，指数下跌 -> 上调胜率（默认，与「点位越低胜率越高」一致）
+  #   DIRECT  = 同向：指数上涨 -> 上调胜率，指数下跌 -> 下调胜率
+  change-direction: INVERSE
+  # 最终胜率是否裁剪到 [0, 100]
+  clamp-win-rate: true
+  # 数据库数据超过多少自然日未更新则视为过期，需要重新调用接口
+  max-data-staleness-days: 3
+  # 库中至少要有多少条记录才视为“数据完整”
+  min-required-records: 200
+
+  fetch:
+    # 单个数据源请求超时（毫秒）
+    timeout-millis: 10000
+    # 单个数据源最大重试次数
+    retry-times: 2
+    # 重试间隔（毫秒）
+    retry-interval-millis: 800
+    # 数据源连续失败多少次后进入熔断（跳过该源）
+    failure-threshold: 2
+    # 熔断恢复时间（分钟）
+    circuit-open-minutes: 10
+    # 启动后自动检查并补全数据
+    auto-refresh-on-startup: true
+    # 定时任务：每个交易日 18:30 自动更新（周一至周五）
+    scheduled-enabled: true
+    schedule-cron: "0 30 18 * * MON-FRI"
+
+  providers:
+    # 优先级顺序：东方财富 -> 腾讯财经 -> 新浪财经
+    eastmoney:
+      enabled: true
+    tencent:
+      enabled: true
+    sina:
+      enabled: true
+
+# ============ 投资方案模块参数 ============
+plan:
+  # 投资次数默认值（用户可在页面修改）
+  default-times: 4
+  # 投资次数允许范围
+  min-times: 1
+  max-times: 20
+  # 金额保留小数位（元 / 分）
+  amount-scale: 2
+  # 页面默认的可用投资总金额
+  default-total-amount: 100000
+
+# ============ 持仓管理模块参数 ============
+holding:
+  # 高预测胜率阈值（%）：买入时预测胜率 >= 该值的买入记录，单独统计其真实胜率
+  high-win-rate-threshold: 70
+  # 持仓名称最大长度
+  max-position-name-length: 32
+  # 单笔买入金额上限（元）
+  max-buy-amount: 100000000
+  # 计算「买入时预测胜率」所需的最少交易日数量，样本不足时该笔买入不记录预测胜率
+  min-win-rate-samples: 20
+
+# ============ 风险评估模块参数 ============
+# 每个持仓按当前盈亏比例给出分档卖出建议：
+#   盈利超过 3% 卖出剩余仓位的 1/4；超过 5% 再卖出剩余的 1/2；
+#   此后每上涨 1 个点（6%、7%、8%、9%）卖出剩余的 1/4；到 10% 全部卖出。
+# 亏损方向规则完全对称（-3% / -5% / -6% ~ -9% / -10%）。
+# trigger-percent：触发点（持仓盈亏比例 %，止盈为正、止损为负）
+# sell-ratio     ：卖出比例（占「触发时剩余仓位」的比例，1 = 全部卖出）
+risk:
+  amount-scale: 2
+  take-profit-levels:
+    - trigger-percent: 3
+      sell-ratio: 0.25
+    - trigger-percent: 5
+      sell-ratio: 0.5
+    - trigger-percent: 6
+      sell-ratio: 0.25
+    - trigger-percent: 7
+      sell-ratio: 0.25
+    - trigger-percent: 8
+      sell-ratio: 0.25
+    - trigger-percent: 9
+      sell-ratio: 0.25
+    - trigger-percent: 10
+      sell-ratio: 1
+  stop-loss-levels:
+    - trigger-percent: -3
+      sell-ratio: 0.25
+    - trigger-percent: -5
+      sell-ratio: 0.5
+    - trigger-percent: -6
+      sell-ratio: 0.25
+    - trigger-percent: -7
+      sell-ratio: 0.25
+    - trigger-percent: -8
+      sell-ratio: 0.25
+    - trigger-percent: -9
+      sell-ratio: 0.25
+    - trigger-percent: -10
+      sell-ratio: 1

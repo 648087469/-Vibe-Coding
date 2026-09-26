@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投资分析系统</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">IA</div>
+            <div class="brand-text">
+                <strong>投资分析系统</strong>
+                <span>Investment Analysis</span>
+            </div>
+        </div>
+        <nav class="nav">
+            <div class="nav-title">功能模块</div>
+            <a class="nav-item active" href="#/analysis" data-module="analysis">
+                <em class="nav-num">01</em>投资分析
+                <em class="nav-tag">当前</em>
+            </a>
+            <a class="nav-item" href="#/plan" data-module="plan">
+                <em class="nav-num">02</em>投资方案
+                <em class="nav-tag">当前</em>
+            </a>
+            <a class="nav-item" href="#/holding" data-module="holding">
+                <em class="nav-num">03</em>持仓管理
+                <em class="nav-tag">当前</em>
+            </a>
+            <a class="nav-item" href="#/risk" data-module="risk">
+                <em class="nav-num">04</em>风险评估
+                <em class="nav-tag">当前</em>
+            </a>
+        </nav>
+        <div class="sidebar-foot">
+            <div class="foot-row"><span>取样窗口</span><b id="footWindow">365 天</b></div>
+            <div class="foot-row"><span>对比基准</span><b id="footCompare">7 天前</b></div>
+            <div class="foot-row"><span>投资次数</span><b id="footTimes">4 次</b></div>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <!-- ==================== 01 投资分析 ==================== -->
+        <section class="module active" data-module="analysis">
+            <div class="page-head">
+                <div class="page-head-top">
+                    <div>
+                        <div class="page-title">
+                            <h1>投资分析 · 三大指数胜率</h1>
+                            <span class="page-no">MODULE 01</span>
+                        </div>
+                        <p class="subtitle">
+                            上证指数 / 深证成指 / 创业板指 · 基于 365 天点位区间的投资胜率测算，公式参数可在配置文件中调整
+                        </p>
+                    </div>
+                    <div class="page-actions">
+                        <div class="meta-chip">
+                            <span class="meta-label">数据来源</span>
+                            <span class="meta-value" id="sourceValue">--</span>
+                        </div>
+                        <div class="meta-chip">
+                            <span class="meta-label">更新时间</span>
+                            <span class="meta-value" id="generatedAt">--</span>
+                        </div>
+                        <button class="btn primary" id="refreshBtn" type="button">
+                            <span class="btn-icon">⟳</span>刷新数据
+                        </button>
+                    </div>
+                </div>
+                <nav class="page-tabs" data-tabs="analysis">
+                    <button class="tab-btn active" type="button" data-pane="overview">概览</button>
+                    <button class="tab-btn" type="button" data-pane="detail">胜率明细</button>
+                    <button class="tab-btn" type="button" data-pane="trend">指数走势</button>
+                    <button class="tab-btn" type="button" data-pane="rule">规则与计算</button>
+                </nav>
+            </div>
+
+            <div class="alert" id="alertBox" hidden></div>
+            <div class="loading" id="loadingBox">
+                <div class="spinner"></div>
+                <span>正在加载三大指数数据…</span>
+            </div>
+
+            <section class="cards" id="cards" data-pane="overview"></section>
+
+            <section class="panel" data-pane="overview">
+                <div class="panel-head">
+                    <div>
+                        <h2>三大指数胜率对比</h2>
+                        <p class="panel-desc" id="chartDesc">柱高为最终胜率，横线标注该指数的基础胜率</p>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-item"><i class="dot low"></i>机会区间 ≥ 70%</span>
+                        <span class="legend-item"><i class="dot mid"></i>中性 45% ~ 70%</span>
+                        <span class="legend-item"><i class="dot high"></i>风险区间 &lt; 45%</span>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <svg id="barChart" class="chart" viewBox="0 0 980 400" role="img"
+                         aria-label="三大指数胜率柱形图"></svg>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="detail">
+                <div class="panel-head">
+                    <div>
+                        <h2>三大指数胜率明细</h2>
+                        <p class="panel-desc" id="tableDesc">
+                            基础胜率由最新点位在 365 天区间中的位置决定，再叠加「7日涨跌幅(%) × 10」的调整
+                        </p>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table" id="winRateTable">
+                        <thead>
+                        <tr>
+                            <th>指数</th>
+                            <th class="num">最新点位</th>
+                            <th class="num">365天最低</th>
+                            <th class="num">365天最高</th>
+                            <th class="num">基础胜率</th>
+                            <th class="num">7日涨跌幅</th>
+                            <th class="num">胜率调整<br><small>涨则减 · 跌则加</small></th>
+                            <th class="num">最终胜率<br><small>基础 + 调整</small></th>
+                            <th>区间判断</th>
+                            <th>数据来源</th>
+                        </tr>
+                        </thead>
+                        <tbody id="winRateBody">
+                        <tr><td colspan="10" class="empty">加载中…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="trend">
+                <div class="panel-head">
+                    <div>
+                        <h2>指数走势与胜率区间</h2>
+                        <p class="panel-desc">曲线为近 365 天收盘点位，标注点为计算胜率所用的最高点与最低点</p>
+                    </div>
+                    <div class="tabs" id="trendTabs"></div>
+                </div>
+                <div class="chart-wrap">
+                    <svg id="trendChart" class="chart" viewBox="0 0 980 380" role="img"
+                         aria-label="指数走势折线图"></svg>
+                    <div class="tooltip" id="trendTooltip" hidden></div>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="rule">
+                <div class="panel-head">
+                    <div>
+                        <h2>胜率计算规则</h2>
+                        <p class="panel-desc">页面所有数值均由后端实时计算并落库，公式参数可在 application.yml 调整</p>
+                    </div>
+                </div>
+                <div class="formula-box" id="formulaBox">--</div>
+                <ul class="rule-list">
+                    <li><b>第一步</b>：取三大指数最近 365 天的全部点位，找出窗口内的<b>最低值</b>与<b>最高值</b>。</li>
+                    <li><b>第二步</b>：最新点位处于最低值时基础胜率为 <b>90%</b>，处于最高值时为 <b>10%</b>，中间区间线性均分。</li>
+                    <li><b>第三步</b>：计算最新一天对比 7 天前的<b>涨跌幅百分比</b>，用该百分比乘以 <b>10</b>
+                        （是百分比 × 10，<u>不是点位差 × 10</u>）。</li>
+                    <li><b>第四步</b>：调整项<b>反向</b>作用于胜率——指数上涨则扣减胜率，指数下跌则增加胜率。</li>
+                    <li><b>第五步</b>：<b>最终胜率 = 基础胜率 − 涨跌幅(%) × 10</b>，并限制在 0% ~ 100% 区间内。</li>
+                    <li><b>数据来源</b>：优先读取数据库（index_daily）；无数据、数据不完整或已过期时自动调用行情接口拉取并入库。</li>
+                </ul>
+            </section>
+
+            <section class="panel" data-pane="rule">
+                <div class="panel-head">
+                    <div>
+                        <h2>胜率计算过程（逐步核对）</h2>
+                        <p class="panel-desc">把每个指数代入实际数值后的算式完整列出，可直接对照验算</p>
+                    </div>
+                </div>
+                <div class="calc-grid" id="calcGrid"></div>
+            </section>
+        </section>
+
+        <!-- ==================== 02 投资方案 ==================== -->
+        <section class="module" data-module="plan">
+            <div class="page-head">
+                <div class="page-head-top">
+                    <div>
+                        <div class="page-title">
+                            <h1>投资方案 · 分批建仓测算</h1>
+                            <span class="page-no">MODULE 02</span>
+                        </div>
+                        <p class="subtitle">共进行 n 次投资（默认 4 次），每次投资金额 = 此前已经累计的投资金额</p>
+                    </div>
+                    <div class="page-actions">
+                        <div class="meta-chip">
+                            <span class="meta-label">投资次数</span>
+                            <span class="meta-value" id="planTimesChip">4 次</span>
+                        </div>
+                        <div class="meta-chip">
+                            <span class="meta-label">方案使用总额</span>
+                            <span class="meta-value" id="planUsedChip">--</span>
+                        </div>
+                        <button class="btn primary" id="planGenerateBtn" type="button">
+                            <span class="btn-icon">⟳</span>生成方案
+                        </button>
+                    </div>
+                </div>
+                <nav class="page-tabs" data-tabs="plan">
+                    <button class="tab-btn active" type="button" data-pane="overview">方案测算</button>
+                    <button class="tab-btn" type="button" data-pane="detail">投资明细</button>
+                    <button class="tab-btn" type="button" data-pane="rule">方案规则</button>
+                </nav>
+            </div>
+
+            <div class="alert" id="planAlert" hidden></div>
+
+            <section class="panel" data-pane="overview">
+                <div class="panel-head">
+                    <div>
+                        <h2>方案参数</h2>
+                        <p class="panel-desc">输入可用投资总金额，系统自动反推每一次应投入的金额</p>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <label class="field">
+                        <span class="field-label">可用投资总金额（元）</span>
+                        <input type="number" id="planTotalAmount" min="0" step="1000" value="100000"
+                               placeholder="例如 100000">
+                        <span class="field-hint">整个方案的资金上限，最终会精确用完</span>
+                    </label>
+                    <label class="field">
+                        <span class="field-label">投资次数 n</span>
+                        <input type="number" id="planTimesInput" min="1" max="20" step="1" value="4">
+                        <span class="field-hint">默认 4 次，允许 1 ~ 20 次</span>
+                    </label>
+                    <div class="field">
+                        <span class="field-label">快捷金额</span>
+                        <div class="chips" id="planQuickAmounts">
+                            <button type="button" class="chip" data-amount="10000">1 万</button>
+                            <button type="button" class="chip" data-amount="50000">5 万</button>
+                            <button type="button" class="chip" data-amount="100000">10 万</button>
+                            <button type="button" class="chip" data-amount="200000">20 万</button>
+                            <button type="button" class="chip" data-amount="500000">50 万</button>
+                        </div>
+                        <span class="field-hint">同样的规则下，金额越大末次投入越重</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cards" id="planCards" data-pane="overview"></section>
+
+            <section class="panel" data-pane="overview">
+                <div class="panel-head">
+                    <div>
+                        <h2>资金投入节奏</h2>
+                        <p class="panel-desc" id="planChartDesc">柱形为每一期的投入金额，折线为累计投入金额</p>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-item"><i class="dot low"></i>每期投入金额</span>
+                        <span class="legend-item"><i class="dot mid"></i>累计投入金额</span>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <svg id="planChart" class="chart" viewBox="0 0 980 400" role="img"
+                         aria-label="投资方案资金投入柱形图"></svg>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="detail">
+                <div class="panel-head">
+                    <div>
+                        <h2>投资方案明细</h2>
+                        <p class="panel-desc" id="planTableDesc">
+                            每一次的投资金额均等于此前各期的累计投入金额，n 次投资后累计使用金额等于可用总金额
+                        </p>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table plan-table">
+                        <thead>
+                        <tr>
+                            <th>期次</th>
+                            <th class="num">本期投入金额（元）</th>
+                            <th class="num">占总额比例</th>
+                            <th class="num">累计投入（元）</th>
+                            <th class="num">累计占比</th>
+                            <th>计算说明</th>
+                        </tr>
+                        </thead>
+                        <tbody id="planTableBody">
+                        <tr><td colspan="6" class="empty">正在生成方案…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="rule">
+                <div class="panel-head">
+                    <div>
+                        <h2>方案规则</h2>
+                        <p class="panel-desc">规则的数学形式与参数说明</p>
+                    </div>
+                </div>
+                <div class="formula-box" id="planRuleBox">--</div>
+                <ul class="rule-list">
+                    <li><b>设定</b>：总共进行 <b>n</b> 次投资，n 可配置，页面默认 <b>4</b> 次。</li>
+                    <li><b>规则</b>：<b>每次投资金额 = 此前已经累计的投资金额</b>，各期金额依次为
+                        <code>B、B、2B、4B、8B…</code>（B 为首次投入金额）。</li>
+                    <li><b>反推</b>：n 次累计使用金额为 <code>B × 2^(n-1)</code>，令其等于可用总金额 T，
+                        得到首次投入 <code>B = T ÷ 2^(n-1)</code>。</li>
+                    <li><b>总额</b>：第 n 次用「总金额 − 此前累计」计算，保证使用的总体金额精确等于输入的可用投资总金额。</li>
+                    <li><b>提示</b>：该方案越往后投入越重，末期占比很高，请结合自身风险承受能力使用。</li>
+                </ul>
+            </section>
+        </section>
+
+        <!-- ==================== 03 持仓管理 ==================== -->
+        <section class="module" data-module="holding">
+            <div class="page-head">
+                <div class="page-head-top">
+                    <div>
+                        <div class="page-title">
+                            <h1>持仓管理 · 买入记录与盈亏跟踪</h1>
+                            <span class="page-no">MODULE 03</span>
+                        </div>
+                        <p class="subtitle">
+                            录入持仓名称、买入日期与金额，系统自动记录买入成本（当日指数收盘点位）与买入时的预测胜率
+                        </p>
+                    </div>
+                    <div class="page-actions">
+                        <div class="meta-chip">
+                            <span class="meta-label">买入总次数</span>
+                            <span class="meta-value" id="holdingBuyChip">0 次</span>
+                        </div>
+                        <div class="meta-chip">
+                            <span class="meta-label">最新点位更新</span>
+                            <span class="meta-value" id="holdingQuoteChip">--</span>
+                        </div>
+                        <button class="btn ghost" id="holdingRefreshBtn" type="button">
+                            <span class="btn-icon">⟳</span>刷新点位
+                        </button>
+                    </div>
+                </div>
+                <nav class="page-tabs" data-tabs="holding">
+                    <button class="tab-btn active" type="button" data-pane="overview">持仓概览</button>
+                    <button class="tab-btn" type="button" data-pane="input">录入买入</button>
+                    <button class="tab-btn" type="button" data-pane="detail">持仓明细</button>
+                    <button class="tab-btn" type="button" data-pane="records">买入记录</button>
+                    <button class="tab-btn" type="button" data-pane="rule">管理规则</button>
+                </nav>
+            </div>
+
+            <div class="alert" id="holdingAlert" hidden></div>
+            <div class="loading" id="holdingLoading">
+                <div class="spinner"></div>
+                <span>正在装载持仓与最新点位…</span>
+            </div>
+
+            <section class="cards" id="holdingCards" data-pane="overview"></section>
+
+            <section class="panel" data-pane="overview">
+                <div class="panel-head">
+                    <div>
+                        <h2>各持仓买入次数</h2>
+                        <p class="panel-desc" id="holdingChartDesc">
+                            柱高为买入次数，橙色折线与圆点为持仓预测胜率（每笔预测胜率之和 ÷ 买入次数）
+                        </p>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-item"><i class="dot low"></i>买入次数</span>
+                        <span class="legend-item"><i class="dot mid"></i>持仓预测胜率</span>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <svg id="holdingChart" class="chart" viewBox="0 0 980 420" role="img"
+                         aria-label="各持仓买入次数柱形图"></svg>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="input">
+                <div class="panel-head">
+                    <div>
+                        <h2>录入买入</h2>
+                        <p class="panel-desc">持仓名称与关联指数相同的记录会自动合并为一个持仓，只累加买入次数</p>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <label class="field">
+                        <span class="field-label">持仓名称</span>
+                        <input type="text" id="holdingName" maxlength="32" placeholder="例如 上证指数定投">
+                        <span class="field-hint">自定义名称，同名同指数视为同一个持仓</span>
+                    </label>
+                    <label class="field">
+                        <span class="field-label">关联指数（用于取成本与最新点位）</span>
+                        <select id="holdingIndex"></select>
+                        <span class="field-hint">买入成本 = 该指数在买入日的收盘点位</span>
+                    </label>
+                    <label class="field">
+                        <span class="field-label">买入日期</span>
+                        <input type="date" id="holdingDate">
+                        <span class="field-hint" id="holdingDateHint">非交易日会自动向前取最近交易日</span>
+                    </label>
+                    <label class="field">
+                        <span class="field-label">买入金额（元）</span>
+                        <input type="number" id="holdingAmount" min="0" step="1000" placeholder="例如 10000">
+                        <span class="field-hint" id="holdingAmountHint">用于计算该笔买入当前的盈亏金额</span>
+                    </label>
+                    <div class="field">
+                        <span class="field-label">快捷填写</span>
+                        <div class="chips" id="holdingQuick">
+                            <button type="button" class="chip" data-name="上证指数定投" data-code="000001">上证指数定投</button>
+                            <button type="button" class="chip" data-name="深证成指定投" data-code="399001">深证成指定投</button>
+                            <button type="button" class="chip" data-name="创业板指定投" data-code="399006">创业板指定投</button>
+                        </div>
+                        <span class="field-hint">点击后自动填入持仓名称与关联指数</span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn primary" id="holdingSubmitBtn" type="button">
+                        <span class="btn-icon">＋</span>记录买入
+                    </button>
+                    <span class="field-hint" id="holdingFormHint">
+                        提交后写入数据库：买入日期、买入金额、买入成本、买入时预测胜率
+                    </span>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="detail">
+                <div class="panel-head">
+                    <div>
+                        <h2>持仓明细</h2>
+                        <p class="panel-desc" id="holdingTableDesc">
+                            按最新点位判断每个持仓当前是盈还是亏；真实胜率 = 当前盈利的买入笔数 ÷ 买入次数
+                        </p>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table holding-table">
+                        <thead>
+                        <tr>
+                            <th>持仓</th>
+                            <th class="num">买入<br><small>次数 / 首末</small></th>
+                            <th class="num">投入 / 市值<br><small>（元）</small></th>
+                            <th class="num">成本 → 最新<br><small>（点位）</small></th>
+                            <th class="num">盈亏<br><small>（元 / %）</small></th>
+                            <th class="num">预测胜率<br><small>每笔之和 ÷ 次数</small></th>
+                            <th class="num">真实胜率<br><small>盈利 ÷ 次数 · 含 ≥70%</small></th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="holdingTableBody">
+                        <tr><td colspan="8" class="empty">正在加载持仓数据…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="records">
+                <div class="panel-head">
+                    <div>
+                        <h2>买入记录明细</h2>
+                        <p class="panel-desc" id="holdingRecordDesc">
+                            每笔买入的日期、金额、成本点位、买入时的预测胜率，以及按最新点位算出的盈亏
+                        </p>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table holding-record-table">
+                        <thead>
+                        <tr>
+                            <th>持仓</th>
+                            <th>买入日期<br><small>含成本取数交易日</small></th>
+                            <th class="num">买入金额<br><small>（元）</small></th>
+                            <th class="num">买入成本<br><small>（点位）</small></th>
+                            <th class="num">最新点位<br><small>（涨跌幅）</small></th>
+                            <th class="num">买入时预测胜率</th>
+                            <th class="num">盈亏<br><small>（元）</small></th>
+                            <th>结果</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="holdingRecordBody">
+                        <tr><td colspan="9" class="empty">正在加载买入记录…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="rule">
+                <div class="panel-head">
+                    <div>
+                        <h2>持仓管理规则</h2>
+                        <p class="panel-desc">成本、盈亏、真实胜率与预测胜率的计算口径</p>
+                    </div>
+                </div>
+                <div class="formula-box" id="holdingRuleBox">--</div>
+                <ul class="rule-list">
+                    <li><b>录入</b>：用户输入持仓名称、具体买入日期与买入金额，系统落库保存这三项信息。</li>
+                    <li><b>成本</b>：买入成本 = 关联指数在该买入日（非交易日则向前取最近交易日）的收盘点位，随买入记录一并落库。</li>
+                    <li><b>预测胜率</b>：以买入日期为终点、最近 365 天行情按投资分析模块同一套规则算出的最终胜率，同样落库保存。</li>
+                    <li><b>盈亏</b>：以最新点位为最新价格，单笔盈亏 = 买入金额 ×（最新点位 − 买入成本）÷ 买入成本；持仓按加权平均成本口径汇总。</li>
+                    <li><b>真实胜率</b>：按最新点位判断当前盈利的买入笔数 ÷ 买入次数，覆盖全部持仓统计。</li>
+                    <li><b>预测胜率</b>：每笔买入的预测胜率之和 ÷ 买入次数；预测胜率 ≥ 70% 的买入单独统计真实胜率。</li>
+                </ul>
+            </section>
+        </section>
+
+        <!-- ==================== 04 风险评估 ==================== -->
+        <section class="module" data-module="risk">
+            <div class="page-head">
+                <div class="page-head-top">
+                    <div>
+                        <div class="page-title">
+                            <h1>风险评估 · 分档止盈 / 止损建议</h1>
+                            <span class="page-no">MODULE 04</span>
+                        </div>
+                        <p class="subtitle">
+                            盈利超过 3% 卖出 1/4、超过 5% 再卖出剩余的 1/2，此后每上涨 1 个点卖出剩余的 1/4，
+                            到 10% 全部卖出；亏损方向规则对称
+                        </p>
+                    </div>
+                    <div class="page-actions">
+                        <div class="meta-chip">
+                            <span class="meta-label">评估方案数</span>
+                            <span class="meta-value" id="riskPlanChip">0 个</span>
+                        </div>
+                        <div class="meta-chip">
+                            <span class="meta-label">建议卖出合计</span>
+                            <span class="meta-value" id="riskSellChip">--</span>
+                        </div>
+                        <button class="btn ghost" id="riskRefreshBtn" type="button">
+                            <span class="btn-icon">⟳</span>刷新点位
+                        </button>
+                    </div>
+                </div>
+                <nav class="page-tabs" data-tabs="risk">
+                    <button class="tab-btn active" type="button" data-pane="overview">方案建议</button>
+                    <button class="tab-btn" type="button" data-pane="detail">阶梯明细</button>
+                    <button class="tab-btn" type="button" data-pane="rule">规则与阶梯</button>
+                </nav>
+            </div>
+
+            <div class="alert" id="riskAlert" hidden></div>
+            <div class="loading" id="riskLoading">
+                <div class="spinner"></div>
+                <span>正在评估各持仓的止盈/止损方案…</span>
+            </div>
+
+            <section class="cards" id="riskCards" data-pane="overview"></section>
+
+            <section class="panel" data-pane="overview">
+                <div class="panel-head">
+                    <div>
+                        <h2>各方案建议（逐个持仓给出）</h2>
+                        <p class="panel-desc" id="riskListDesc">
+                            每个持仓为一个方案：先给当前应执行的建议，再列出已触发档位与下一档触发点
+                        </p>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-item"><i class="dot high"></i>当前档位（需执行）</span>
+                        <span class="legend-item"><i class="dot mid"></i>已触发档位</span>
+                    </div>
+                </div>
+                <div class="risk-list" id="riskList">
+                    <div class="empty">正在生成方案建议…</div>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="detail">
+                <div class="panel-head">
+                    <div>
+                        <h2>方案建议明细</h2>
+                        <p class="panel-desc" id="riskTableDesc">
+                            每个持仓的每一档触发点、卖出比例、累计卖出、剩余仓位与预计卖出金额
+                        </p>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table risk-table">
+                        <thead>
+                        <tr>
+                            <th>持仓</th>
+                            <th>方向</th>
+                            <th class="num">触发点</th>
+                            <th class="num">卖出比例<br><small>占当时剩余仓位</small></th>
+                            <th class="num">该档卖出量<br><small>占初始仓位</small></th>
+                            <th class="num">累计卖出<br><small>占初始仓位</small></th>
+                            <th class="num">执行后剩余</th>
+                            <th class="num">预计卖出金额<br><small>按当前市值折算</small></th>
+                            <th>状态</th>
+                            <th>建议说明</th>
+                        </tr>
+                        </thead>
+                        <tbody id="riskTableBody">
+                        <tr><td colspan="10" class="empty">正在生成方案建议…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel" data-pane="rule">
+                <div class="panel-head">
+                    <div>
+                        <h2>评估规则与阶梯</h2>
+                        <p class="panel-desc">各档「卖出比例」指触发时剩余仓位的比例，逐档执行即得到累计卖出与剩余仓位</p>
+                    </div>
+                </div>
+                <div class="formula-box" id="riskRuleBox">--</div>
+                <div class="risk-ladder-grid">
+                    <div class="calc-card" style="--accent:#12a150">
+                        <div class="calc-title">止盈阶梯 <span>PROFIT</span></div>
+                        <ol class="ladder-list" id="riskProfitLadder"></ol>
+                    </div>
+                    <div class="calc-card" style="--accent:#dc2f2f">
+                        <div class="calc-title">止损阶梯 <span>LOSS</span></div>
+                        <ol class="ladder-list" id="riskLossLadder"></ol>
+                    </div>
+                </div>
+                <ul class="rule-list">
+                    <li><b>适用对象</b>：直接读取「持仓管理」中的持仓、买入成本与关联指数最新点位，一个持仓对应一个评估方案。</li>
+                    <li><b>止盈阶梯</b>：盈利超过 <b>3%</b> 卖出剩余仓位的 <b>1/4</b>；超过 <b>5%</b> 再卖出剩余的 <b>1/2</b>；
+                        此后每上涨 <b>1 个点</b>（6%、7%、8%、9%）卖出剩余的 <b>1/4</b>；到 <b>10%</b> 全部卖出。</li>
+                    <li><b>止损阶梯</b>：亏损方向规则相同，即 -3% 卖 1/4、-5% 再卖 1/2、-6% ~ -9% 每档卖剩余 1/4、-10% 全部卖出。</li>
+                    <li><b>剩余仓位</b>：各档卖出比例均针对「触发时的剩余仓位」，逐档相乘得到累计卖出比例与剩余仓位，
+                        例如 +5% 档执行后累计卖出 62.5%、剩余 37.5%。</li>
+                    <li><b>金额折算</b>：预计卖出金额 = 当前市值 × 该档卖出量占初始仓位的比例，未扣除此前已卖出部分，实际执行请以账户剩余仓位为准。</li>
+                    <li><b>提示</b>：阶梯参数可在 <code>application.yml</code> 的 <code>risk.*</code> 中调整；评估结果仅为纪律化参考，不构成投资建议。</li>
+                </ul>
+            </section>
+        </section>
+
+        <footer class="page-foot">
+            投资分析系统 · 数据来源于公开行情接口，测算与建议结果为参考，仅用于技术演示，不构成任何投资建议
+        </footer>
+    </main>
+</div>
+
+<button class="to-top" id="toTop" type="button" title="回到顶部">↑</button>
+<script src="/js/app.js"></script>
+</body>
+</html>
